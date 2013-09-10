@@ -126,11 +126,11 @@ int main(int argc,char **argv)
 
 /* ############################################################ */
 
-void is_root(char ** proname)
+void is_root(char ** pro_name)
 {
     if (getuid() != 0)
     {
-    printf("\n Usage: sudo %s  \n\n", proname[0]);
+    printf("\n Usage: sudo %s  \n\n", pro_name[0]);
 
         exit(1);
     }
