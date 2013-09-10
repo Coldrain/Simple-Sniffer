@@ -1,14 +1,16 @@
 /*
-
-sudo apt-get install libpcap0.8-dev
-
-cc sniffer.c -lpcap -o testing
-
--- Ornek filtreler
-ip                   	Capture all IP packets.
-tcp			Capture only TCP packets.
-tcp port 80		Capture only TCP packets with a port equal to 80.
-ip host 10.1.2.3	Capture all IP packets to or from host 10.1.2.3.\n
+*
+*
+* sudo apt-get install libpcap0.8-dev
+*
+* cc sniffer.c -lpcap -o testing
+*
+* -- Ornek filtreler
+* ip                   	Capture all IP packets.
+* tcp			Capture only TCP packets.
+* tcp port 80		Capture only TCP packets with a port equal to 80.
+* ip host 10.1.2.3	Capture all IP packets to or from host 10.1.2.3.\n
+*
 */
 
 #include <pcap.h>
@@ -46,85 +48,78 @@ int main(int argc,char **argv)
 
 	struct bpf_program fp;
 
-	char filter_exp[] = "ip";
+	char filter_exp[] = "ip"; 
 
 
-    is_root(argv);
-    list_device();
+    	is_root(argv);
+	list_device();
 
 	printf("\nEnter the interface NAME or Press [Enter] key - default(%s) : ", pcap_lookupdev(errbuf));
 	fflush(stdout);
 
-    fgets(device_name_buff, sizeof(device_name_buff)-1, stdin);
-    device_name_buff[strlen(device_name_buff)-1] = '\0';
+    	fgets(device_name_buff, sizeof(device_name_buff)-1, stdin);
+    	device_name_buff[strlen(device_name_buff)-1] = '\0';
 
-    if(strlen(device_name_buff) < 2)
-        device_name = pcap_lookupdev(errbuf);
+    	if(strlen(device_name_buff) < 2)
+        	device_name = pcap_lookupdev(errbuf);
 
-    printf("Enter the number of packet(s) which you want to capture - default(100): ");
-    fflush(stdout);
+    	printf("Enter the number of packet(s) which you want to capture - default(100): ");
+    	fflush(stdout);
 
-    fgets(packet_num_buff, sizeof(packet_num_buff)-1, stdin);
-    packet_num_buff[strlen(packet_num_buff)-1] = '\0';
+	    fgets(packet_num_buff, sizeof(packet_num_buff)-1, stdin);
+    	packet_num_buff[strlen(packet_num_buff)-1] = '\0';
 
-    packet_no = atoi(packet_num_buff);
+	packet_no = atoi(packet_num_buff);
 
-    if(packet_no == 0)
-        packet_no = 100;
+    	if(packet_no == 0)
+        	packet_no = 100;
 
-    if(strlen(device_name))
-    {
-        printf("\n ---You opted for device [%s] to will capture [%d] packets---\n",device_name, (packet_no));
-    }
-    else
-    {
-        printf("\n[%s]\n", errbuf);
-        exit(1);
-    }
+    	if(strlen(device_name))
+	{
+		printf("\n ---You opted for device [%s] to will capture [%d] packets---\n",device_name, (packet_no));
+	}
+    	else
+    	{
+        	printf("\n[%s]\n", errbuf);
+        	exit(1);
+    	}
 
-    // fetch the network address and network mask
-    if (pcap_lookupnet(device_name, &pcap_network, &pcap_netmask, errbuf) == -1)
-    {
+
+    	if (pcap_lookupnet(device_name, &pcap_network, &pcap_netmask, errbuf) == -1)
+    	{
 		fprintf(stderr, "Couldn't get netmask for device %s: %s\n", device_name, errbuf);
 		exit(1);
 	}
 
-    // Now, open device for sniffing
-    handle = pcap_open_live(device_name, BUFSIZ, 1, 0, errbuf);
 
-    if(handle == NULL)
-    {
-        printf("pcap_open_live() failed due to [%s]\n", errbuf);
-        exit(1);
-    }
+    	handle = pcap_open_live(device_name, BUFSIZ, 1, 0, errbuf);
 
-
-    // Compile the filter expression
-    if(pcap_compile(handle, &fp, filter_exp, 0, pcap_network) == -1)
-    {
-        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        exit(1);
-    }
-
-    // Set the filter compiled above
-    if(pcap_setfilter(handle, &fp) == -1)
-    {
-        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        exit(1);
-    }
-    summary_information();
-    // For every packet received, call the callback function
-    // For now, maximum limit on number of packets is specified
-    // by user.
-    struct pcap_pkthdr header;	/* The header that pcap gives us */
-    const u_char *packet;
-    /* Grab a packet */
+    	if(handle == NULL)
+    	{
+        	printf("pcap_open_live() failed due to [%s]\n", errbuf);
+        	exit(1);
+    	}
 
 
-    pcap_loop(handle, packet_no, callback, NULL);
+    	if(pcap_compile(handle, &fp, filter_exp, 0, pcap_network) == -1)
+    	{
+        	fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+        	exit(1);
+    	}
 
-    printf("\nDone with packet sniffing!\n");
-    return 0;
+
+    	if(pcap_setfilter(handle, &fp) == -1)
+    	{
+		fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+        	exit(1);
+    	}
+    	
+    	summary_information();
+ 
+    	pcap_loop(handle, packet_no, callback, NULL);
+
+    	printf("\nDone with packet sniffing!\n");
+    	return 0;
 }
 
 
@@ -148,7 +143,7 @@ void list_device()
     int count = 0;
     pcap_if_t *alldevs, *device;
 
-    if (pcap_findalldevs(&alldevs, errbuf) == -1) // Prepare a list of all the devices
+    if (pcap_findalldevs(&alldevs, errbuf) == -1)
 	{
 		fprintf(stderr,"\nError in pcap_findalldevs: %s\n", errbuf);
 		exit(1);
@@ -174,7 +169,7 @@ void summary_information()
     struct in_addr addr;
     addr.s_addr = pcap_network;
     network_address = inet_ntoa(addr);
-    if(network_address == NULL)/* thanks Scott :-P */
+    if(network_address == NULL)
     {
         perror("inet_ntoa");
         exit(1);
@@ -214,15 +209,15 @@ void callback(u_char *arg, const struct pcap_pkthdr* pkthdr, const u_char* packe
     printf("\r");
     fflush(stdout);
     printf("Captured %d packets", ++count);
-    fprintf(logp, "Packet No: %-6d ", count);    /* Number of Packets */
-    fprintf(logp, "Recieved Packet Size: %-6d Date: ", pkthdr->len);    /* Length of header */
-    fprintf(logp, ctime(&mytime));                /* And now the data */
+    fprintf(logp, "Packet No: %-6d ", count);   
+    fprintf(logp, "Recieved Packet Size: %-6d Date: ", pkthdr->len);   
+    fprintf(logp, ctime(&mytime));                
     for(i = 0; i < pkthdr->len; i++)
     {
-        if(isprint(packet[i]))                /* Check if the packet data is printable */
-            fprintf(logp, "%c",packet[i]);          /* Print it */
+        if(isprint(packet[i]))               
+            fprintf(logp, "%c",packet[i]);          
         else
-            fprintf(logp, ".",packet[i]);          /* If not print a . */
+            fprintf(logp, ".",packet[i]);          
     }
     fprintf(logp, "\n#########\n\n");
 
