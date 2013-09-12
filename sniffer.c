@@ -66,7 +66,7 @@ int main(int argc,char **argv)
     	printf("Enter the number of packet(s) which you want to capture - default(100): ");
     	fflush(stdout);
 
-	    fgets(packet_num_buff, sizeof(packet_num_buff)-1, stdin);
+	fgets(packet_num_buff, sizeof(packet_num_buff)-1, stdin);
     	packet_num_buff[strlen(packet_num_buff)-1] = '\0';
 
 	packet_no = atoi(packet_num_buff);
